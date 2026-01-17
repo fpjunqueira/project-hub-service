@@ -4,6 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import pexper.projects.project_hub.domain.Address;
+import pexper.projects.project_hub.domain.File;
+import pexper.projects.project_hub.domain.Owner;
 import pexper.projects.project_hub.domain.Project;
 import pexper.projects.project_hub.services.ProjectService;
 
@@ -45,5 +48,26 @@ public class ProjectsController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         projectService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/owners")
+    public List<Owner> getOwners(@PathVariable Long id) {
+        Project project = projectService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found: " + id));
+        return new java.util.ArrayList<>(project.getOwners());
+    }
+
+    @GetMapping("/{id}/files")
+    public List<File> getFiles(@PathVariable Long id) {
+        Project project = projectService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found: " + id));
+        return new java.util.ArrayList<>(project.getFiles());
+    }
+
+    @GetMapping("/{id}/address")
+    public ResponseEntity<Address> getAddress(@PathVariable Long id) {
+        Project project = projectService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found: " + id));
+        return ResponseEntity.ok(project.getAddress());
     }
 }
