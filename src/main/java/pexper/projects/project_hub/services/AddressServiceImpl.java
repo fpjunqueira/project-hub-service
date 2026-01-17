@@ -1,5 +1,7 @@
 package pexper.projects.project_hub.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,6 +26,11 @@ public class AddressServiceImpl implements AddressService {
         List<Address> addresses = new ArrayList<>();
         addressRepository.findAll().forEach(addresses::add);
         return addresses;
+    }
+
+    @Override
+    public Page<Address> findAll(Pageable pageable) {
+        return addressRepository.findAll(pageable);
     }
 
     @Override

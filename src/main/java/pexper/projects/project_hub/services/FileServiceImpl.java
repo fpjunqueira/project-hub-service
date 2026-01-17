@@ -1,5 +1,7 @@
 package pexper.projects.project_hub.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,6 +31,11 @@ public class FileServiceImpl implements FileService {
         List<FileRecordDto> files = new ArrayList<>();
         fileRepository.findAll().forEach(file -> files.add(toDto(file)));
         return files;
+    }
+
+    @Override
+    public Page<FileRecordDto> findAll(Pageable pageable) {
+        return fileRepository.findAll(pageable).map(this::toDto);
     }
 
     @Override

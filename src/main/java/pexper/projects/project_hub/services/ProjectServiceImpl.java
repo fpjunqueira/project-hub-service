@@ -1,5 +1,7 @@
 package pexper.projects.project_hub.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,6 +40,11 @@ public class ProjectServiceImpl implements ProjectService {
         List<Project> projects = new ArrayList<>();
         projectRepository.findAll().forEach(projects::add);
         return projects;
+    }
+
+    @Override
+    public Page<Project> findAll(Pageable pageable) {
+        return projectRepository.findAll(pageable);
     }
 
     @Override

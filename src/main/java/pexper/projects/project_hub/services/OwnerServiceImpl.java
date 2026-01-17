@@ -1,5 +1,7 @@
 package pexper.projects.project_hub.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,6 +26,11 @@ public class OwnerServiceImpl implements OwnerService {
         List<Owner> owners = new ArrayList<>();
         ownerRepository.findAll().forEach(owners::add);
         return owners;
+    }
+
+    @Override
+    public Page<Owner> findAll(Pageable pageable) {
+        return ownerRepository.findAll(pageable);
     }
 
     @Override

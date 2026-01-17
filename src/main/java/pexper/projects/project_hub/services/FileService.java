@@ -1,5 +1,7 @@
 package pexper.projects.project_hub.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import pexper.projects.project_hub.dto.FileRecordDto;
 
 import java.util.List;
@@ -7,6 +9,8 @@ import java.util.Optional;
 
 public interface FileService {
     List<FileRecordDto> findAll();
+
+    Page<FileRecordDto> findAll(Pageable pageable);
 
     Optional<FileRecordDto> findById(Long id);
 
