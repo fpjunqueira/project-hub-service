@@ -11,6 +11,9 @@ import pexper.projects.project_hub.repositories.FileRepository;
 import pexper.projects.project_hub.repositories.OwnerRepository;
 import pexper.projects.project_hub.repositories.ProjectRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class BootstrapData implements CommandLineRunner {
 
@@ -31,85 +34,122 @@ public class BootstrapData implements CommandLineRunner {
     public void run(String... args) throws Exception {
         System.out.println("BootstrapData starting...");
 
-        var ownerAna = new Owner();
-        ownerAna.setName("Ana Souza");
-        ownerAna.setEmail("ana.souza@example.com");
+        List<Project> projects = new ArrayList<>();
+        String[] projectNames = {
+                "Atlas Migration",
+                "Nimbus Analytics",
+                "Orion Console",
+                "Nova CRM",
+                "Zenith Payments",
+                "Pulse Inventory",
+                "Harbor Compliance",
+                "Vertex Mobile",
+                "Lumen AI",
+                "Summit Scheduler"
+        };
 
-        var ownerBruno = new Owner();
-        ownerBruno.setName("Bruno Lima");
-        ownerBruno.setEmail("bruno.lima@example.com");
+        for (String name : projectNames) {
+            var project = new Project();
+            project.setProjectName(name);
+            projects.add(project);
+        }
 
-        var projectAtlas = new Project();
-        projectAtlas.setProjectName("Atlas Migration");
+        List<Owner> owners = new ArrayList<>();
+        String[][] ownerData = {
+                {"Ana Souza", "ana.souza@example.com"},
+                {"Bruno Lima", "bruno.lima@example.com"},
+                {"Carla Mendes", "carla.mendes@example.com"},
+                {"Diego Santos", "diego.santos@example.com"},
+                {"Eduarda Freitas", "eduarda.freitas@example.com"},
+                {"Fabio Ramos", "fabio.ramos@example.com"},
+                {"Gabriela Costa", "gabriela.costa@example.com"},
+                {"Helena Moraes", "helena.moraes@example.com"},
+                {"Igor Pereira", "igor.pereira@example.com"},
+                {"Julia Nogueira", "julia.nogueira@example.com"},
+                {"Kaique Oliveira", "kaique.oliveira@example.com"},
+                {"Larissa Rocha", "larissa.rocha@example.com"},
+                {"Marcos Araujo", "marcos.araujo@example.com"},
+                {"Nadia Rezende", "nadia.rezende@example.com"},
+                {"Otavio Teixeira", "otavio.teixeira@example.com"}
+        };
 
-        var projectNimbus = new Project();
-        projectNimbus.setProjectName("Nimbus Analytics");
+        for (String[] data : ownerData) {
+            var owner = new Owner();
+            owner.setName(data[0]);
+            owner.setEmail(data[1]);
+            owners.add(owner);
+        }
 
-        ownerAna.getProjects().add(projectAtlas);
-        ownerAna.getProjects().add(projectNimbus);
-        ownerBruno.getProjects().add(projectNimbus);
+        for (int i = 0; i < owners.size(); i++) {
+            Owner owner = owners.get(i);
+            Project primary = projects.get(i % projects.size());
+            Project secondary = projects.get((i + 3) % projects.size());
 
-        projectAtlas.getOwners().add(ownerAna);
-        projectNimbus.getOwners().add(ownerAna);
-        projectNimbus.getOwners().add(ownerBruno);
+            owner.getProjects().add(primary);
+            owner.getProjects().add(secondary);
+            primary.getOwners().add(owner);
+            secondary.getOwners().add(owner);
+        }
 
-        ownerRepository.save(ownerAna);
-        ownerRepository.save(ownerBruno);
-        projectRepository.save(projectAtlas);
-        projectRepository.save(projectNimbus);
+        ownerRepository.saveAll(owners);
+        projectRepository.saveAll(projects);
 
-        var atlasSpec = new File();
-        atlasSpec.setFilename("atlas-spec.pdf");
-        atlasSpec.setPath("/projects/atlas/specs/atlas-spec.pdf");
-        atlasSpec.setProject(projectAtlas);
-        projectAtlas.getFiles().add(atlasSpec);
+        List<File> files = new ArrayList<>();
+        for (int i = 1; i <= 80; i++) {
+            Project project = projects.get((i - 1) % projects.size());
+            String slug = slugify(project.getProjectName());
 
-        var atlasPlan = new File();
-        atlasPlan.setFilename("atlas-plan.xlsx");
-        atlasPlan.setPath("/projects/atlas/plans/atlas-plan.xlsx");
-        atlasPlan.setProject(projectAtlas);
-        projectAtlas.getFiles().add(atlasPlan);
+            var file = new File();
+            file.setFilename("file-" + String.format("%03d", i) + ".txt");
+            file.setPath("/projects/" + slug + "/docs/file-" + String.format("%03d", i) + ".txt");
+            file.setProject(project);
+            project.getFiles().add(file);
+            files.add(file);
+        }
+        fileRepository.saveAll(files);
 
-        var nimbusReadme = new File();
-        nimbusReadme.setFilename("nimbus-readme.md");
-        nimbusReadme.setPath("/projects/nimbus/docs/nimbus-readme.md");
-        nimbusReadme.setProject(projectNimbus);
-        projectNimbus.getFiles().add(nimbusReadme);
+        List<Address> addresses = new ArrayList<>();
+        for (int i = 0; i < owners.size(); i++) {
+            Owner owner = owners.get(i);
+            var address = new Address();
+            address.setStreet("Owner Street " + (i + 1));
+            address.setCity("Sao Paulo");
+            address.setState("SP");
+            address.setNumber(String.valueOf(100 + i));
+            address.setZipCode("0100" + i + "-000");
+            address.setOwner(owner);
+            owner.setAddress(address);
+            addresses.add(address);
+        }
 
-        fileRepository.save(atlasSpec);
-        fileRepository.save(atlasPlan);
-        fileRepository.save(nimbusReadme);
+        for (int i = 0; i < projects.size(); i++) {
+            Project project = projects.get(i);
+            var address = new Address();
+            address.setStreet("Project Avenue " + (i + 1));
+            address.setCity("Campinas");
+            address.setState("SP");
+            address.setNumber(String.valueOf(500 + i));
+            address.setZipCode("1301" + i + "-100");
+            address.setProject(project);
+            project.setAddress(address);
+            addresses.add(address);
+        }
 
-        var addressAna = new Address();
-        addressAna.setStreet("Rua das Flores");
-        addressAna.setCity("Sao Paulo");
-        addressAna.setState("SP");
-        addressAna.setNumber("120");
-        addressAna.setZipCode("01001-000");
-        addressAna.setOwner(ownerAna);
-
-        var addressAtlas = new Address();
-        addressAtlas.setStreet("Avenida Central");
-        addressAtlas.setCity("Campinas");
-        addressAtlas.setState("SP");
-        addressAtlas.setNumber("500");
-        addressAtlas.setZipCode("13010-100");
-        addressAtlas.setProject(projectAtlas);
-
-        addressRepository.save(addressAna);
-        addressRepository.save(addressAtlas);
-
-        ownerAna.setAddress(addressAna);
-        projectAtlas.setAddress(addressAtlas);
-
-        ownerRepository.save(ownerAna);
-        projectRepository.save(projectAtlas);
+        addressRepository.saveAll(addresses);
+        ownerRepository.saveAll(owners);
+        projectRepository.saveAll(projects);
 
         System.out.println("Owners loaded: " + ownerRepository.count());
         System.out.println("Projects loaded: " + projectRepository.count());
         System.out.println("Addresses loaded: " + addressRepository.count());
         System.out.println("Files loaded: " + fileRepository.count());
         System.out.println("BootstrapData completed.");
+    }
+
+    private String slugify(String value) {
+        return value.toLowerCase()
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replace(" ", "-");
     }
 
 }

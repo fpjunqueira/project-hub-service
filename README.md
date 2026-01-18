@@ -61,6 +61,16 @@ core concepts of the system: projects, owners, addresses, and files.
 - **`OpenApiConfig`** - Swagger / OpenAPI setup.
 - **`WebConfig`** - web and CORS configuration.
 
+### Profiles
+
+The default profile is `h2`, which uses an in-memory database for local runs.
+Use the `persist` profile to connect to MySQL.
+
+- `h2` uses `application-h2.properties`.
+- `persist` uses `application-persist.properties` and reads MySQL settings from
+  `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and
+  `SPRING_DATASOURCE_PASSWORD` (with local defaults).
+
 ## Building and Running
 
 ### Using Maven Wrapper
@@ -75,6 +85,12 @@ On Windows (PowerShell):
 .\mvnw.cmd spring-boot:run
 ```
 
+To run with MySQL:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=persist
+```
+
 ### Using Docker
 
 ```bash
@@ -87,6 +103,8 @@ docker run -p 8080:8080 project-hub-service
 ```bash
 docker-compose up --build
 ```
+
+The compose stack starts MySQL and runs the API with the `persist` profile.
 
 ### Using Helper Shell Scripts
 
@@ -135,3 +153,27 @@ Run tests with:
 ```bash
 ./mvnw test
 ```
+
+## Review
+
+- Lambdas
+- Records
+- Threads/syncronized
+- Actuator
+- java versions
+- microservices/patterns
+- azure (cloud)
+- interfaces funcionais (???)
+- jdk, jvm, jrm
+
+## Modules
+
+- Seção 11: MySql with Spring Boot
+- Seção 16: Paging and Sorting with Spring MVC
+- Seção 23: Spring Authorization Server
+- Seção 24: Spring MVC OAuth2 Resource Server
+- Seção 30: Spring Data MongDB
+- Seção 37: Spring Cloud Gateway
+- Seção 44: Spring Boot Actuator
+- Seção 51: Kubernetes with Spring Boot
+- Seção 53: Spring Boot Microservices with Apache Kafka

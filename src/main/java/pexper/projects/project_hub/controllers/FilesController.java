@@ -1,5 +1,7 @@
 package pexper.projects.project_hub.controllers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +26,13 @@ public class FilesController {
     }
 
     @GetMapping
-    public List<FileRecordDto> getAll() {
+    public Page<FileRecordDto> getAll(@RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "10") int size) {
+        return fileService.findAll(PageRequest.of(page, size));
+    }
+
+    @GetMapping("/all")
+    public List<FileRecordDto> getAllFull() {
         return fileService.findAll();
     }
 
