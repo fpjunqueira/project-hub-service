@@ -131,6 +131,45 @@ OpenAPI/Swagger is enabled. When the service is running, visit:
   or
 - `http://localhost:8080/swagger-ui/index.html`
 
+## Actuator
+
+Spring Boot Actuator is included to expose operational endpoints for health checks and
+diagnostics.
+
+### Default Endpoints
+
+By default, only `health` and `info` are exposed over HTTP:
+
+- `http://localhost:8080/actuator/health`
+- `http://localhost:8080/actuator/info`
+
+### Expose More Endpoints
+
+To expose additional endpoints, add or update the following properties in
+`application.properties` (or a profile-specific file like `application-h2.properties`):
+
+```properties
+management.endpoints.web.base-path=/actuator
+management.endpoints.web.exposure.include=health,info,metrics,env,loggers,threaddump
+management.endpoint.health.show-details=when_authorized
+```
+
+Notes:
+
+- Use `management.endpoints.web.exposure.include=*` only in local/dev.
+- Keep sensitive endpoints (`env`, `loggers`) restricted in production.
+- `management.endpoint.health.show-details` can be `never`, `when_authorized`, or `always`.
+
+### Quick Checks
+
+Examples using `curl`:
+
+```bash
+curl http://localhost:8080/actuator
+curl http://localhost:8080/actuator/health
+curl http://localhost:8080/actuator/metrics
+```
+
 ## Data Bootstrapping
 
 `bootstrap/BootstrapData` can seed initial data for local development, making it easier to
@@ -177,3 +216,11 @@ Run tests with:
 - Seção 44: Spring Boot Actuator
 - Seção 51: Kubernetes with Spring Boot
 - Seção 53: Spring Boot Microservices with Apache Kafka
+
+# TODO
+
+- add tests JUnit
+- complement vi tests 
+- sprint actuator
+- test profiles
+- lambdas
