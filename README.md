@@ -57,7 +57,7 @@ core concepts of the system: projects, owners, addresses, and files.
 
 ## Configuration
 
-- **`application.properties`** - app settings (database, server port, etc).
+- **`application.yml`** - app settings (database, server port, etc).
 - **`OpenApiConfig`** - Swagger / OpenAPI setup.
 - **`WebConfig`** - web and CORS configuration.
 
@@ -66,8 +66,8 @@ core concepts of the system: projects, owners, addresses, and files.
 The default profile is `h2`, which uses an in-memory database for local runs.
 Use the `persist` profile to connect to MySQL.
 
-- `h2` uses `application-h2.properties`.
-- `persist` uses `application-persist.properties` and reads MySQL settings from
+- `h2` uses `application-h2.yml`.
+- `persist` uses `application-persist.yml` and reads MySQL settings from
   `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and
   `SPRING_DATASOURCE_PASSWORD` (with local defaults).
 
@@ -101,7 +101,28 @@ To run with MySQL:
 
 To re-seed MySQL data, drop the database (or truncate the tables) and restart with
 `persist`, or edit `db/mysql/data.sql` and restart. If you want to disable seeding,
-set `spring.sql.init.mode=never` in `application-persist.properties`.
+set `spring.sql.init.mode=never` in `application-persist.yml`.
+
+### SQLite (Optional)
+
+Dependencies are already included. Create `application-sqlite.yml` with:
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:sqlite:./project-hub.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+```
+
+Then run:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=sqlite
+```
 
 ### Using Docker
 
@@ -117,6 +138,18 @@ docker-compose up --build
 ```
 
 The compose stack starts MySQL and runs the API with the `persist` profile.
+
+### Accessing MySQL (phpMyAdmin)
+
+When using Docker Compose, phpMyAdmin is available at:
+
+- `http://localhost:8082/`
+
+Login with:
+
+- Server: `db`
+- Username: `project_hub`
+- Password: `project_hub`
 
 ### Using Helper Shell Scripts
 
@@ -179,14 +212,17 @@ Authorization: Bearer <token>
 
 ### Default User and JWT Settings
 
-Update these in `application.properties` for local/dev:
+Update these in `application.yml` for local/dev:
 
-```properties
-app.jwt.secret=change-me-to-a-long-random-secret
-app.jwt.expiration-minutes=60
-app.auth.default-user=admin
-app.auth.default-password=admin123
-app.auth.default-role=ADMIN
+```yaml
+app:
+  jwt:
+    secret: change-me-to-a-long-random-secret
+    expiration-minutes: 60
+  auth:
+    default-user: admin
+    default-password: admin123
+    default-role: ADMIN
 ```
 
 `bootstrap/UserBootstrapData` creates the default user on startup if it does not exist.
@@ -219,12 +255,18 @@ By default, only `health` and `info` are exposed over HTTP:
 ### Expose More Endpoints
 
 To expose additional endpoints, add or update the following properties in
-`application.properties` (or a profile-specific file like `application-h2.properties`):
+`application.yml` (or a profile-specific file like `application-h2.yml`):
 
-```properties
-management.endpoints.web.base-path=/actuator
-management.endpoints.web.exposure.include=health,info,metrics,env,loggers,threaddump
-management.endpoint.health.show-details=when_authorized
+```yaml
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info,metrics,env,loggers,threaddump
+  endpoint:
+    health:
+      show-details: when_authorized
 ```
 
 Notes:
@@ -304,7 +346,7 @@ On Windows (PowerShell):
 
 ## Modules
 
-`- Seção 11: MySql with Spring Boot`
+`- Seção 11: MySql with Spring Boot` -> ADMIN
 `- Seção 16: Paging and Sorting with Spring MVC`
 `- Seção 23: Spring Authorization Server`
 `- Seção 24: Spring MVC OAuth2 Resource Server`
