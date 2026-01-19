@@ -35,5 +35,17 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
+  phpmyadmin:
+    image: phpmyadmin:5
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: project_hub
+      PMA_PASSWORD: project_hub
+    ports:
+      - "8082:80"
+    depends_on:
+      - db
+
 volumes:
   mysql-data:

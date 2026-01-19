@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: project-hub
+  profiles:
+    active: h2
+
+app:
+  jwt:
+    secret: change-me-to-a-long-random-secret
+    expiration-minutes: 60
+  auth:
+    default-user: admin
+    default-password: admin123
+    default-role: ADMIN
