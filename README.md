@@ -131,6 +131,67 @@ OpenAPI/Swagger is enabled. When the service is running, visit:
   or
 - `http://localhost:8080/swagger-ui/index.html`
 
+## Authentication (Spring Security + JWT)
+
+All `/api/**` endpoints are protected. Clients must authenticate and send a Bearer token on
+every request.
+
+### Login Endpoint
+
+`POST /api/auth/login`
+
+Request body:
+
+```json
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+Response body:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tokenType": "Bearer",
+  "expiresAt": "2026-01-18T23:10:00Z"
+}
+```
+
+Use the token on all API calls:
+
+```
+Authorization: Bearer <token>
+```
+
+### Default User and JWT Settings
+
+Update these in `application.properties` for local/dev:
+
+```properties
+app.jwt.secret=change-me-to-a-long-random-secret
+app.jwt.expiration-minutes=60
+app.auth.default-user=admin
+app.auth.default-password=admin123
+app.auth.default-role=ADMIN
+```
+
+`bootstrap/UserBootstrapData` creates the default user on startup if it does not exist.
+
+## Frontend (Angular) Authentication Flow
+
+The Angular app logs in, stores the token, and attaches it on every API call.
+
+High level flow:
+
+1. `LoginComponent` posts credentials to `/api/auth/login`.
+2. `AuthService` stores the `token` (the app uses the `Bearer` scheme).
+3. `AuthInterceptor` adds `Authorization: Bearer <token>` to all `/api/**` requests.
+
+If the backend runs on a different port (example `8081`), update the Angular API base URL or
+proxy to match the running backend URL.
+
 ## Actuator
 
 Spring Boot Actuator is included to expose operational endpoints for health checks and
