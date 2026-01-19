@@ -103,6 +103,23 @@ To re-seed MySQL data, drop the database (or truncate the tables) and restart wi
 `persist`, or edit `db/mysql/data.sql` and restart. If you want to disable seeding,
 set `spring.sql.init.mode=never` in `application-persist.properties`.
 
+### SQLite (Optional)
+
+Dependencies are already included. Create `application-sqlite.properties` with:
+
+```properties
+spring.datasource.url=jdbc:sqlite:./project-hub.db
+spring.datasource.driver-class-name=org.sqlite.JDBC
+spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
+spring.jpa.hibernate.ddl-auto=update
+```
+
+Then run:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=sqlite
+```
+
 ### Using Docker
 
 ```bash
