@@ -71,6 +71,14 @@ Use the `persist` profile to connect to MySQL.
   `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and
   `SPRING_DATASOURCE_PASSWORD` (with local defaults).
 
+When the `persist` profile is active, the service loads seed data from
+`src/main/resources/db/mysql/data.sql`. This runs on every startup with the
+`persist` profile and is intended for local/dev usage.
+
+SQLite dependencies are included (`sqlite-jdbc` and Hibernate community dialects).
+To use SQLite, define a profile with a `jdbc:sqlite:` URL and set
+`spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect`.
+
 ## Building and Running
 
 ### Using Maven Wrapper
@@ -90,6 +98,10 @@ To run with MySQL:
 ```bash
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=persist
 ```
+
+To re-seed MySQL data, drop the database (or truncate the tables) and restart with
+`persist`, or edit `db/mysql/data.sql` and restart. If you want to disable seeding,
+set `spring.sql.init.mode=never` in `application-persist.properties`.
 
 ### Using Docker
 
