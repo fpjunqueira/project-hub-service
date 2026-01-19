@@ -224,3 +224,4 @@ Run tests with:
 - sprint actuator
 - test profiles
 - lambdas
+- persist erros (db operations)
