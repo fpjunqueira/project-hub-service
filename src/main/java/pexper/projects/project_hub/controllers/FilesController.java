@@ -2,12 +2,17 @@ package pexper.projects.project_hub.controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import pexper.projects.project_hub.domain.Project;
 import pexper.projects.project_hub.dto.FileRecordDto;
+import pexper.projects.project_hub.services.FileDownload;
 import pexper.projects.project_hub.services.FileService;
 import pexper.projects.project_hub.services.ProjectService;
 
@@ -48,6 +53,20 @@ public class FilesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<FileRecordDto> upload(@RequestParam("file") MultipartFile file,
+                                                @RequestParam(required = false) Long projectId) {
+        FileRecordDto stored = fileService.store(file, projectId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(stored);
+    }
+
+    @PostMapping(value = "/{id}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<FileRecordDto> uploadForFile(@PathVariable Long id,
+                                                       @RequestParam("file") MultipartFile file) {
+        FileRecordDto stored = fileService.storeForFile(id, file);
+        return ResponseEntity.ok(stored);
+    }
+
     @PutMapping("/{id}")
     public FileRecordDto update(@PathVariable Long id, @RequestBody FileRecordDto fileRecord) {
         return fileService.update(id, fileRecord);
@@ -69,5 +88,15 @@ public class FilesController {
         Project project = projectService.findById(file.getProjectId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found: " + file.getProjectId()));
         return ResponseEntity.ok(project);
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> download(@PathVariable Long id) {
+        FileDownload fileDownload = fileService.loadForDownload(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(fileDownload.contentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + fileDownload.filename() + "\"")
+                .body(fileDownload.resource());
     }
 }

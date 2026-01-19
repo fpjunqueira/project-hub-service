@@ -12,3 +12,5 @@ app:
     default-user: admin
     default-password: admin123
     default-role: ADMIN
+  storage:
+    base-path: storage

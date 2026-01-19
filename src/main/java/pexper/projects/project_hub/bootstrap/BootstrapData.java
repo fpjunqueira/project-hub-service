@@ -4,11 +4,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import pexper.projects.project_hub.domain.Address;
-import pexper.projects.project_hub.domain.File;
 import pexper.projects.project_hub.domain.Owner;
 import pexper.projects.project_hub.domain.Project;
 import pexper.projects.project_hub.repositories.AddressRepository;
-import pexper.projects.project_hub.repositories.FileRepository;
 import pexper.projects.project_hub.repositories.OwnerRepository;
 import pexper.projects.project_hub.repositories.ProjectRepository;
 
@@ -22,13 +20,13 @@ public class BootstrapData implements CommandLineRunner {
     private final ProjectRepository projectRepository;
     private final OwnerRepository ownerRepository;
     private final AddressRepository addressRepository;
-    private final FileRepository fileRepository;
 
-    public BootstrapData(ProjectRepository projectRepository, OwnerRepository ownerRepository, AddressRepository addressRepository, FileRepository fileRepository) {
+    public BootstrapData(ProjectRepository projectRepository,
+                         OwnerRepository ownerRepository,
+                         AddressRepository addressRepository) {
         this.projectRepository = projectRepository;
         this.ownerRepository = ownerRepository;
         this.addressRepository = addressRepository;
-        this.fileRepository = fileRepository;
     }
 
 
@@ -96,20 +94,6 @@ public class BootstrapData implements CommandLineRunner {
         ownerRepository.saveAll(owners);
         projectRepository.saveAll(projects);
 
-        List<File> files = new ArrayList<>();
-        for (int i = 1; i <= 80; i++) {
-            Project project = projects.get((i - 1) % projects.size());
-            String slug = slugify(project.getProjectName());
-
-            var file = new File();
-            file.setFilename("file-" + String.format("%03d", i) + ".txt");
-            file.setPath("/projects/" + slug + "/docs/file-" + String.format("%03d", i) + ".txt");
-            file.setProject(project);
-            project.getFiles().add(file);
-            files.add(file);
-        }
-        fileRepository.saveAll(files);
-
         List<Address> addresses = new ArrayList<>();
         for (int i = 0; i < owners.size(); i++) {
             Owner owner = owners.get(i);
@@ -144,14 +128,7 @@ public class BootstrapData implements CommandLineRunner {
         System.out.println("Owners loaded: " + ownerRepository.count());
         System.out.println("Projects loaded: " + projectRepository.count());
         System.out.println("Addresses loaded: " + addressRepository.count());
-        System.out.println("Files loaded: " + fileRepository.count());
         System.out.println("BootstrapData completed.");
-    }
-
-    private String slugify(String value) {
-        return value.toLowerCase()
-                .replaceAll("[^a-z0-9\\s-]", "")
-                .replace(" ", "-");
     }
 
 }

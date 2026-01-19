@@ -61,6 +61,11 @@ core concepts of the system: projects, owners, addresses, and files.
 - **`OpenApiConfig`** - Swagger / OpenAPI setup.
 - **`WebConfig`** - web and CORS configuration.
 
+## Prerequisites
+
+- JDK 25 (see `pom.xml` `java.version`).
+- Docker + Docker Compose for the MySQL stack (optional).
+
 ### Profiles
 
 The default profile is `h2`, which uses an in-memory database for local runs.
@@ -79,6 +84,12 @@ SQLite dependencies are included (`sqlite-jdbc` and Hibernate community dialects
 To use SQLite, define a profile with a `jdbc:sqlite:` URL and set
 `spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect`.
 
+### Environment Variables (persist profile)
+
+- `SPRING_DATASOURCE_URL` (defaults to localhost with `project_hub` database).
+- `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD`.
+- `SPRING_PROFILES_ACTIVE=persist` when running outside of Maven profile flags.
+
 ## Building and Running
 
 ### Using Maven Wrapper
@@ -93,6 +104,18 @@ On Windows (PowerShell):
 .\mvnw.cmd spring-boot:run
 ```
 
+### Quickstart (H2)
+
+1. Start the API with the default `h2` profile (commands above).
+2. Login at `POST /api/auth/login` using `admin` / `admin123`.
+3. Call a protected endpoint (example below).
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d "{\"username\":\"admin\",\"password\":\"admin123\"}"
+```
+
 To run with MySQL:
 
 ```bash
@@ -102,6 +125,18 @@ To run with MySQL:
 To re-seed MySQL data, drop the database (or truncate the tables) and restart with
 `persist`, or edit `db/mysql/data.sql` and restart. If you want to disable seeding,
 set `spring.sql.init.mode=never` in `application-persist.yml`.
+
+### H2 Console
+
+When running with the `h2` profile, the console is enabled at:
+
+- `http://localhost:8080/h2-console`
+
+Use:
+
+- JDBC URL: `jdbc:h2:mem:projecthubdb`
+- User: `sa`
+- Password: (empty)
 
 ### SQLite (Optional)
 
@@ -131,6 +166,22 @@ docker build -t project-hub-service .
 docker run -p 8080:8080 project-hub-service
 ```
 
+To run with MySQL settings (same as `persist` profile):
+
+```bash
+docker run -p 8080:8080 \
+  -e SPRING_PROFILES_ACTIVE=persist \
+  -e SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/project_hub \
+  -e SPRING_DATASOURCE_USERNAME=project_hub \
+  -e SPRING_DATASOURCE_PASSWORD=project_hub \
+  project-hub-service
+```
+
+Notes:
+
+- `host.docker.internal` works on Docker Desktop (Windows/macOS). On Linux, use the host IP.
+- MySQL must be reachable and the `project_hub` database must exist.
+
 ### Using Docker Compose
 
 ```bash
@@ -138,6 +189,12 @@ docker-compose up --build
 ```
 
 The compose stack starts MySQL and runs the API with the `persist` profile.
+
+To stop and remove containers/volumes:
+
+```bash
+docker-compose down -v
+```
 
 ### Accessing MySQL (phpMyAdmin)
 
@@ -168,6 +225,21 @@ Use `rebuild.sh` when you want to force a fresh rebuild of images before startin
 ./rebuild.sh
 ```
 
+### PowerShell Helper Script
+
+On Windows, you can use:
+
+```powershell
+.\build-and-run.ps1
+```
+
+### Default Ports
+
+- API: `8080`
+- MySQL (Compose): `3306`
+- phpMyAdmin (Compose): `8082`
+- Angular dev server (if running separately): `4200`
+
 ## API Documentation
 
 OpenAPI/Swagger is enabled. When the service is running, visit:
@@ -175,6 +247,39 @@ OpenAPI/Swagger is enabled. When the service is running, visit:
 - `http://localhost:8080/swagger-ui.html`
   or
 - `http://localhost:8080/swagger-ui/index.html`
+
+## API Endpoints
+
+All endpoints are prefixed with `/api` and require authentication unless noted.
+Each aggregate exposes CRUD endpoints plus a paginated list and a full list.
+
+- **Auth**: `POST /api/auth/login`
+- **Projects**: `/api/projects`, `/api/projects/all`, `/api/projects/{id}`,
+  `/api/projects/{id}/owners`, `/api/projects/{id}/files`, `/api/projects/{id}/address`
+- **Owners**: `/api/owners`, `/api/owners/all`, `/api/owners/{id}`,
+  `/api/owners/{id}/projects`, `/api/owners/{id}/address`
+- **Addresses**: `/api/addresses`, `/api/addresses/all`, `/api/addresses/{id}`,
+  `/api/addresses/{id}/owner`, `/api/addresses/{id}/project`
+- **Files**: `/api/files`, `/api/files/all`, `/api/files/{id}`, `/api/files/{id}/project`
+
+### Pagination
+
+Paginated list endpoints accept:
+
+- `page` (default `0`)
+- `size` (default `10`)
+
+Example:
+
+```bash
+curl -H "Authorization: Bearer <token>" \
+  "http://localhost:8080/api/projects?page=0&size=20"
+```
+
+### CORS
+
+By default, CORS allows the Angular dev server at `http://localhost:4200`
+for `/api/**`. Update `WebConfig` if you need additional origins.
 
 ## Authentication (Spring Security + JWT)
 
@@ -332,32 +437,15 @@ On Windows (PowerShell):
 .\mvnw.cmd clean test
 ```
 
-## Review
+## Troubleshooting
 
-- Lambdas
-- Records
-- Threads/syncronized
-- Actuator
-- java versions
-- microservices/patterns
-- azure (cloud)
-- interfaces funcionais (???)
-- jdk, jvm, jrm
+- **401/403**: check the JWT secret and login credentials in `application.yml`.
+- **CORS errors**: update `WebConfig` allowed origins to match your frontend URL.
+- **MySQL connection**: ensure the database exists and the `persist` env vars are set.
 
-## Modules
+## Data Model Summary
 
-`- Seção 11: MySql with Spring Boot` -> ADMIN
-`- Seção 16: Paging and Sorting with Spring MVC`
-`- Seção 23: Spring Authorization Server`
-`- Seção 24: Spring MVC OAuth2 Resource Server`
-- Seção 30: Spring Data MongDB
-- Seção 37: Spring Cloud Gateway
-`- Seção 44: Spring Boot Actuator`
-- Seção 51: Kubernetes with Spring Boot
-- Seção 53: Spring Boot Microservices with Apache Kafka
-
-# TODO
-
-- complement vi tests
-- lambdas
-- Records
+- **Owner** has one `Address` and many `Project`s (many-to-many).
+- **Project** has one `Address`, many `Owner`s, and many `File`s.
+- **Address** belongs to either one `Owner` or one `Project`.
+- **File** belongs to a `Project` and is exposed as a DTO.
