@@ -248,10 +248,34 @@ work with the frontend right away.
 
 ## Tests
 
-Run tests with:
+Run the unit test suite with:
 
 ```bash
 ./mvnw test
+```
+
+On Windows (PowerShell):
+
+```powershell
+.\mvnw.cmd test
+```
+
+### Test Coverage (JaCoCo)
+
+Coverage reports are generated automatically when tests run. The HTML report is located at:
+
+- `target/site/jacoco/index.html`
+
+If you want to force a fresh report:
+
+```bash
+./mvnw clean test
+```
+
+On Windows (PowerShell):
+
+```powershell
+.\mvnw.cmd clean test
 ```
 
 ## Review
@@ -268,21 +292,18 @@ Run tests with:
 
 ## Modules
 
-- Seção 11: MySql with Spring Boot
-- Seção 16: Paging and Sorting with Spring MVC
-- Seção 23: Spring Authorization Server
-- Seção 24: Spring MVC OAuth2 Resource Server
+`- Seção 11: MySql with Spring Boot`
+`- Seção 16: Paging and Sorting with Spring MVC`
+`- Seção 23: Spring Authorization Server`
+`- Seção 24: Spring MVC OAuth2 Resource Server`
 - Seção 30: Spring Data MongDB
 - Seção 37: Spring Cloud Gateway
-- Seção 44: Spring Boot Actuator
+`- Seção 44: Spring Boot Actuator`
 - Seção 51: Kubernetes with Spring Boot
 - Seção 53: Spring Boot Microservices with Apache Kafka
 
 # TODO
 
-- add tests JUnit
-- complement vi tests 
-- sprint actuator
-- test profiles
+- complement vi tests
 - lambdas
-- persist erros (db operations)
+- Records
