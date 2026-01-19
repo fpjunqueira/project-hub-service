@@ -1,6 +1,7 @@
 package pexper.projects.project_hub.bootstrap;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import pexper.projects.project_hub.domain.Address;
 import pexper.projects.project_hub.domain.File;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Profile("h2")
 public class BootstrapData implements CommandLineRunner {
 
     private final ProjectRepository projectRepository;
