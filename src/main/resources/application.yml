@@ -3,17 +3,6 @@ spring:
     name: project-hub
   profiles:
     active: h2
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${OIDC_ISSUER_URI:https://login.microsoftonline.com/your-tenant-id/v2.0}
-          audiences: ${OIDC_AUDIENCE:api://project-hub}
-
-security:
-  claims:
-    group-role-mappings:
-      "00000000-0000-0000-0000-000000000000": "ADMIN"
 
 app:
   jwt:

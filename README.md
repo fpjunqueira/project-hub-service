@@ -99,13 +99,6 @@ To run with MySQL:
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=persist
 ```
 
-One-off terminal run (PowerShell):
-
-```powershell
-.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=h2
-.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=persist
-```
-
 To re-seed MySQL data, drop the database (or truncate the tables) and restart with
 `persist`, or edit `db/mysql/data.sql` and restart. If you want to disable seeding,
 set `spring.sql.init.mode=never` in `application-persist.yml`.
@@ -339,9 +332,21 @@ On Windows (PowerShell):
 .\mvnw.cmd clean test
 ```
 
+## Review
+
+- Lambdas
+- Records
+- Threads/syncronized
+- Actuator
+- java versions
+- microservices/patterns
+- azure (cloud)
+- interfaces funcionais (???)
+- jdk, jvm, jrm
+
 ## Modules
 
-`- Seção 11: MySql with Spring Boot`
+`- Seção 11: MySql with Spring Boot` -> ADMIN
 `- Seção 16: Paging and Sorting with Spring MVC`
 `- Seção 23: Spring Authorization Server`
 `- Seção 24: Spring MVC OAuth2 Resource Server`
@@ -351,29 +356,8 @@ On Windows (PowerShell):
 - Seção 51: Kubernetes with Spring Boot
 - Seção 53: Spring Boot Microservices with Apache Kafka
 
-- **Owner** has one `Address` and many `Project`s (many-to-many).
-- **Project** has one `Address`, many `Owner`s, and many `File`s.
-- **Address** belongs to either one `Owner` or one `Project`.
-- **File** belongs to a `Project` and is exposed as a DTO.
-
-## Review
-
-- ProjectHubApplication
-- application (h2 and persist profiles)
-- dockerFiles and docker-compose
-- sqlite and data.sql file
-- build-and-run
-- rebuild
-
-## TODO
+# TODO
 
 - complement vi tests
-- Lambdas
+- lambdas
 - Records
-- Threads/syncronized
-- Actuator
-- java versions
-- microservices/patterns
-- azure (cloud)
-- functional interfaces
-- jdk, jvm, jrm
