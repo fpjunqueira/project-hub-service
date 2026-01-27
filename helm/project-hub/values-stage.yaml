@@ -1,0 +1,13 @@
+replicaCount: 2
+
+env:
+  OIDC_ISSUER_URI: "https://login.microsoftonline.com/your-tenant-id/v2.0"
+  OIDC_AUDIENCE: "api://project-hub"
+
+ingress:
+  enabled: true
+  hosts:
+    - host: project-hub.stage.example.com
+      paths:
+        - path: /
+          pathType: Prefix
