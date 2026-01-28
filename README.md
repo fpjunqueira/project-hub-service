@@ -357,7 +357,13 @@ On Windows (PowerShell):
 - Seção 53: Spring Boot Microservices with Apache Kafka
 
 # TODO
+## Auth (firstly)
 
-- complement vi tests
-- lambdas
-- Records
+22 -  HHTP Basic Auth
+23 - Auth Server
+24 - MVC OAuth2
+36 - OAuth Client
+`Other READMEs (auth)`
+
+## Helm / AKS / ARO (Azure Openshift)
+ 
