@@ -344,10 +344,6 @@ On Windows (PowerShell):
 - interfaces funcionais (???)
 - jdk, jvm, jrm
 
-- Lambda
-- Virtual Threads 
-- Arquitetura exagonal
-
 ## Modules
 
 `- Seção 11: MySql with Spring Boot` -> ADMIN
@@ -360,12 +356,10 @@ On Windows (PowerShell):
 - Seção 51: Kubernetes with Spring Boot
 - Seção 53: Spring Boot Microservices with Apache Kafka
 
-# Cloud (Curso Udemy)
-
 # TODO
 ## Auth (firstly)
 
-22 - HHTP Basic Auth
+22 -  HHTP Basic Auth
 23 - Auth Server
 24 - MVC OAuth2
 36 - OAuth Client
