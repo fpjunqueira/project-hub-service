@@ -14,23 +14,23 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class CadastroContrato {
+public class ContractRegistration {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     private Long id;
-    private String clienteDireto;
-    private String gestorClienteDireto;
-    private String clienteFinal;
-    private String gestorClienteFinal;
-    private String projetoTipo;
-    private String projetoNumero;
-    private String oc;
-    private String os;
-    private String po;
+    private String directClient;
+    private String directClientManager;
+    private String finalClient;
+    private String finalClientManager;
+    private String projectType;
+    private String projectNumber;
+    private String purchaseOrder;
+    private String serviceOrder;
+    private String poNumber;
     private String siteId;
-    private String enderecoId;
-    private String valorTotalProjeto;
-    private String fasesProjeto;
+    private String addressId;
+    private String totalProjectValue;
+    private String projectPhases;
 }

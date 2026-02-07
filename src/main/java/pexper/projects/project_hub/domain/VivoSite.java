@@ -14,24 +14,25 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class SiteTim {
+public class VivoSite {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     private Long id;
-    private String siteId;
-    private String tipoElemento;
-    private String tecnologia;
-    private String tipoConexao;
-    private String classificacao;
-    private String dataAquisicao;
-    private String dataConstrucao;
-    private String dataAtivacao;
-    private String dataDesativacao;
-    private String justificativa;
-    private String tipoTorre;
-    private String aevNominal;
-    private String alturaEstrutura;
-    private String statusAtualizacaoSpazio;
+    private String sequence;
+    private String stateAbbreviation;
+    private String state;
+    private String name;
+    private String abbreviation;
+    private String gvOiFixedAbbreviation;
+    private String ssiAddress;
+    private String altitude;
+    private String maintenancePending;
+    private String thirdPartyArea;
+    private String structure;
+    private String vipSite;
+    private String note1;
+    private String note2;
+    private String note3;
 }

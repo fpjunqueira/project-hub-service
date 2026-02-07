@@ -14,30 +14,30 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class SiteClaro {
+public class ClaroSite {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     private Long id;
     private String siteId;
-    private String nome;
+    private String name;
     private String anatelTx;
     private String anatelRf;
-    private String redeAnatel;
-    private String elevacao;
+    private String anatelNetwork;
+    private String elevation;
     private String latitude;
     private String longitude;
     private String latitudeDms;
     private String longitudeDms;
-    private String clusterGeo;
+    private String geoCluster;
     private String datum;
     private String ibge;
-    private String slaInfra;
-    private String classificacaoOmr;
-    private String classContrato;
-    private String licencasGsmUmtsLte;
-    private String observacao1;
-    private String observacao2;
-    private String observacao3;
+    private String infraSla;
+    private String omrClassification;
+    private String contractClass;
+    private String gsmUmtsLteLicenses;
+    private String note1;
+    private String note2;
+    private String note3;
 }
