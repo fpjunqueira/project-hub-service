@@ -161,9 +161,24 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void deleteById(Long id) {
-        if (!projectRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found: " + id);
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found: " + id));
+
+        for (Address address : addressRepository.findByProject_Id(id)) {
+            address.setProject(null);
+            addressRepository.save(address);
         }
+
+        for (File file : project.getFiles()) {
+            file.setProject(null);
+            fileRepository.save(file);
+        }
+
+        project.setAddress(null);
+        project.setContractRegistration(null);
+        project.setOwners(new HashSet<>());
+        project.setFiles(new HashSet<>());
+        projectRepository.save(project);
         projectRepository.deleteById(id);
     }
 }

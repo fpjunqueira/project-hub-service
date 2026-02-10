@@ -97,7 +97,7 @@ class ProjectServiceImplTest {
 
     @Test
     void deleteByIdThrowsWhenMissing() {
-        when(projectRepository.existsById(5L)).thenReturn(false);
+        when(projectRepository.findById(5L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> projectService.deleteById(5L))
                 .isInstanceOf(ResponseStatusException.class)
