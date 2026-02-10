@@ -21,6 +21,7 @@ public class TimSite {
     @EqualsAndHashCode.Include
     private Long id;
     private String siteId;
+    private String addressId;
     private String elementType;
     private String technology;
     private String connectionType;

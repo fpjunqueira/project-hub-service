@@ -21,6 +21,7 @@ public class VivoSite {
     @EqualsAndHashCode.Include
     private Long id;
     private String sequence;
+    private String addressId;
     private String stateAbbreviation;
     private String state;
     private String name;

@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pexper.projects.project_hub.domain.Address;
+import pexper.projects.project_hub.domain.ContractRegistration;
 import pexper.projects.project_hub.domain.File;
 import pexper.projects.project_hub.domain.Owner;
 import pexper.projects.project_hub.domain.Project;
 import pexper.projects.project_hub.repositories.AddressRepository;
+import pexper.projects.project_hub.repositories.ContractRegistrationRepository;
 import pexper.projects.project_hub.repositories.FileRepository;
 import pexper.projects.project_hub.repositories.OwnerRepository;
 import pexper.projects.project_hub.repositories.ProjectRepository;
@@ -27,12 +29,18 @@ public class ProjectServiceImpl implements ProjectService {
     private final OwnerRepository ownerRepository;
     private final AddressRepository addressRepository;
     private final FileRepository fileRepository;
+    private final ContractRegistrationRepository contractRegistrationRepository;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, OwnerRepository ownerRepository, AddressRepository addressRepository, FileRepository fileRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository,
+                              OwnerRepository ownerRepository,
+                              AddressRepository addressRepository,
+                              FileRepository fileRepository,
+                              ContractRegistrationRepository contractRegistrationRepository) {
         this.projectRepository = projectRepository;
         this.ownerRepository = ownerRepository;
         this.addressRepository = addressRepository;
         this.fileRepository = fileRepository;
+        this.contractRegistrationRepository = contractRegistrationRepository;
     }
 
     @Override
@@ -53,7 +61,18 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public List<Project> findByContractRegistrationId(Long contractRegistrationId) {
+        return projectRepository.findByContractRegistrationId(contractRegistrationId);
+    }
+
+    @Override
     public Project save(Project project) {
+        if (project.getContractRegistration() != null && project.getContractRegistration().getId() != null) {
+            Long contractId = project.getContractRegistration().getId();
+            ContractRegistration contractRegistration = contractRegistrationRepository.findById(contractId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ContractRegistration not found: " + contractId));
+            project.setContractRegistration(contractRegistration);
+        }
         return projectRepository.save(project);
     }
 
@@ -62,6 +81,30 @@ public class ProjectServiceImpl implements ProjectService {
         Project existing = projectRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found: " + id));
         existing.setProjectName(project.getProjectName());
+        existing.setProjectType(project.getProjectType());
+        existing.setProjectNumber(project.getProjectNumber());
+        existing.setPurchaseOrder(project.getPurchaseOrder());
+        existing.setServiceOrder(project.getServiceOrder());
+        existing.setPoNumber(project.getPoNumber());
+        existing.setDirectClient(project.getDirectClient());
+        existing.setDirectClientManager(project.getDirectClientManager());
+        existing.setFinalClient(project.getFinalClient());
+        existing.setFinalClientManager(project.getFinalClientManager());
+        existing.setSiteId(project.getSiteId());
+        existing.setAddressId(project.getAddressId());
+
+        if (project.getContractRegistration() != null) {
+            Long contractId = project.getContractRegistration().getId();
+            if (contractId == null) {
+                existing.setContractRegistration(null);
+            } else {
+                ContractRegistration contractRegistration = contractRegistrationRepository.findById(contractId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ContractRegistration not found: " + contractId));
+                existing.setContractRegistration(contractRegistration);
+            }
+        } else if (project.getContractRegistration() == null) {
+            existing.setContractRegistration(null);
+        }
 
         if (project.getOwners() != null) {
             Set<Owner> owners = new HashSet<>();

@@ -229,6 +229,7 @@ public class BootstrapData implements CommandLineRunner {
         List<Billing> billings = new ArrayList<>();
         for (int i = 1; i <= 10; i++) {
             Billing billing = new Billing();
+            Project project = projects.get((i - 1) % projects.size());
             billing.setLegalName("Company " + i);
             billing.setTaxId("00.000.000/000" + i + "-00");
             billing.setBillingAddress("Finance Avenue " + i);
@@ -240,13 +241,13 @@ public class BootstrapData implements CommandLineRunner {
             billing.setEndDate("2026-12-" + String.format("%02d", (i % 28) + 1));
             billing.setCompetenceMonth("2026-" + String.format("%02d", (i % 12) + 1));
             billing.setTotalAmount("15000." + String.format("%02d", i));
-            billing.setFinalClientManager("Manager " + i);
-            billing.setProjectType("Project Type " + ((i % 3) + 1));
-            billing.setProjectNumber("PRJ-" + String.format("%04d", i));
-            billing.setPurchaseOrder("PO-" + String.format("%03d", i));
-            billing.setServiceOrder("SO-" + String.format("%03d", i));
-            billing.setPoNumber("PO-" + String.format("%03d", i));
-            billing.setFinalClient("Final Client " + i);
+            billing.setFinalClientManager(project.getFinalClientManager());
+            billing.setProjectType(project.getProjectType());
+            billing.setProjectNumber(project.getProjectNumber());
+            billing.setPurchaseOrder(project.getPurchaseOrder());
+            billing.setServiceOrder(project.getServiceOrder());
+            billing.setPoNumber(project.getPoNumber());
+            billing.setFinalClient(project.getFinalClient());
             billing.setDescription("Service " + i);
             billing.setFreelancerAmount("1200." + String.format("%02d", i));
             billing.setMaterialsAmount("800." + String.format("%02d", i));
@@ -258,6 +259,7 @@ public class BootstrapData implements CommandLineRunner {
             billing.setTaxIcms("12%");
             billing.setTaxPis("1.65%");
             billing.setTaxCofins("7.6%");
+            billing.setProject(project);
             billings.add(billing);
         }
         billingRepository.saveAll(billings);
@@ -340,6 +342,7 @@ public class BootstrapData implements CommandLineRunner {
         for (int i = 1; i <= 6; i++) {
             ClaroSite site = new ClaroSite();
             site.setSiteId("CLARO-" + i);
+            site.setAddressId("ADDR-CLARO-" + i);
             site.setName("Claro Site " + i);
             site.setAnatelTx("TX-" + i);
             site.setAnatelRf("RF-" + i);
@@ -367,6 +370,7 @@ public class BootstrapData implements CommandLineRunner {
         for (int i = 1; i <= 6; i++) {
             TimSite site = new TimSite();
             site.setSiteId("TIM-" + i);
+            site.setAddressId("ADDR-TIM-" + i);
             site.setElementType("Element " + i);
             site.setTechnology("4G");
             site.setConnectionType("Fiber");
@@ -388,6 +392,7 @@ public class BootstrapData implements CommandLineRunner {
         for (int i = 1; i <= 6; i++) {
             VivoSite site = new VivoSite();
             site.setSequence(String.valueOf(1000 + i));
+            site.setAddressId("ADDR-VIVO-" + i);
             site.setStateAbbreviation("SP");
             site.setState("SP");
             site.setName("Vivo Site " + i);
@@ -418,27 +423,55 @@ public class BootstrapData implements CommandLineRunner {
             contractRegistration.setPurchaseOrder("PO-" + String.format("%03d", i));
             contractRegistration.setServiceOrder("SO-" + String.format("%03d", i));
             contractRegistration.setPoNumber("PO-" + String.format("%03d", i));
-            contractRegistration.setSiteId("SITE-" + i);
-            contractRegistration.setAddressId("ADDR-" + i);
+            contractRegistration.setSiteType(i % 3 == 0 ? "vivo" : (i % 2 == 0 ? "tim" : "claro"));
+            if ("claro".equals(contractRegistration.getSiteType())) {
+                contractRegistration.setSiteId("CLARO-" + i);
+                contractRegistration.setAddressId("ADDR-CLARO-" + i);
+            } else if ("tim".equals(contractRegistration.getSiteType())) {
+                contractRegistration.setSiteId("TIM-" + i);
+                contractRegistration.setAddressId("ADDR-TIM-" + i);
+            } else {
+                contractRegistration.setSiteId(String.valueOf(1000 + i));
+                contractRegistration.setAddressId("ADDR-VIVO-" + i);
+            }
             contractRegistration.setTotalProjectValue("25000." + String.format("%02d", i));
             contractRegistration.setProjectPhases("Phase " + ((i % 4) + 1));
             contractRegistrations.add(contractRegistration);
         }
         contractRegistrationRepository.saveAll(contractRegistrations);
 
+        for (int i = 0; i < projects.size(); i++) {
+            ContractRegistration contractRegistration = contractRegistrations.get(i % contractRegistrations.size());
+            Project project = projects.get(i);
+            project.setContractRegistration(contractRegistration);
+            project.setProjectType(contractRegistration.getProjectType());
+            project.setProjectNumber(contractRegistration.getProjectNumber());
+            project.setPurchaseOrder(contractRegistration.getPurchaseOrder());
+            project.setServiceOrder(contractRegistration.getServiceOrder());
+            project.setPoNumber(contractRegistration.getPoNumber());
+            project.setDirectClient(contractRegistration.getDirectClient());
+            project.setDirectClientManager(contractRegistration.getDirectClientManager());
+            project.setFinalClient(contractRegistration.getFinalClient());
+            project.setFinalClientManager(contractRegistration.getFinalClientManager());
+            project.setSiteId(contractRegistration.getSiteId());
+            project.setAddressId(contractRegistration.getAddressId());
+        }
+        projectRepository.saveAll(projects);
+
         List<Ticket> tickets = new ArrayList<>();
         for (int i = 1; i <= 10; i++) {
             Ticket ticket = new Ticket();
+            Project project = projects.get((i - 1) % projects.size());
             ticket.setTicketNumber("TK-" + String.format("%05d", i));
-            ticket.setDirectClient("Direct Client " + i);
-            ticket.setDirectClientManager("Direct Manager " + i);
-            ticket.setFinalClient("Final Client " + i);
-            ticket.setFinalClientManager("Final Manager " + i);
-            ticket.setProjectType("Project Type " + ((i % 3) + 1));
-            ticket.setProjectNumber("PRJ-" + String.format("%04d", i));
-            ticket.setPurchaseOrder("PO-" + String.format("%03d", i));
-            ticket.setServiceOrder("SO-" + String.format("%03d", i));
-            ticket.setPoNumber("PO-" + String.format("%03d", i));
+            ticket.setDirectClient(project.getDirectClient());
+            ticket.setDirectClientManager(project.getDirectClientManager());
+            ticket.setFinalClient(project.getFinalClient());
+            ticket.setFinalClientManager(project.getFinalClientManager());
+            ticket.setProjectType(project.getProjectType());
+            ticket.setProjectNumber(project.getProjectNumber());
+            ticket.setPurchaseOrder(project.getPurchaseOrder());
+            ticket.setServiceOrder(project.getServiceOrder());
+            ticket.setPoNumber(project.getPoNumber());
             ticket.setAddress("Ticket Street " + i);
             ticket.setAddressNumber(String.valueOf(200 + i));
             ticket.setAddressComplement("Suite " + ((i % 3) + 1));
@@ -447,11 +480,12 @@ public class BootstrapData implements CommandLineRunner {
             ticket.setState("SP");
             ticket.setZipCode("0300" + i + "-000");
             ticket.setLatitudeLongitude("-23.7" + i + ", -46.8" + i);
-            ticket.setSiteType("Site Type " + ((i % 3) + 1));
+            ticket.setSiteType(project.getContractRegistration() != null ? project.getContractRegistration().getSiteType() : "");
             ticket.setAccessReleaseNumber("AR-" + String.format("%04d", i));
             ticket.setTbsaId("TBSA-" + String.format("%03d", i));
             ticket.setTbsaTicket("TBSA-TK-" + String.format("%03d", i));
             ticket.setActivityDescription("Activity description " + i);
+            ticket.setProject(project);
             tickets.add(ticket);
         }
         ticketRepository.saveAll(tickets);

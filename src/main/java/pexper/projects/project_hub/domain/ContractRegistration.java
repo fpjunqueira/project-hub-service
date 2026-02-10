@@ -29,6 +29,7 @@ public class ContractRegistration {
     private String purchaseOrder;
     private String serviceOrder;
     private String poNumber;
+    private String siteType;
     private String siteId;
     private String addressId;
     private String totalProjectValue;

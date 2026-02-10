@@ -14,6 +14,8 @@ public interface ProjectService {
 
     Optional<Project> findById(Long id);
 
+    List<Project> findByContractRegistrationId(Long contractRegistrationId);
+
     Project save(Project project);
 
     Project update(Long id, Project project);

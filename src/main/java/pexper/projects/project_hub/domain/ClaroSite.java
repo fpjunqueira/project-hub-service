@@ -21,6 +21,7 @@ public class ClaroSite {
     @EqualsAndHashCode.Include
     private Long id;
     private String siteId;
+    private String addressId;
     private String name;
     private String anatelTx;
     private String anatelRf;

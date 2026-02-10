@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import pexper.projects.project_hub.domain.Address;
+import pexper.projects.project_hub.domain.ContractRegistration;
 import pexper.projects.project_hub.domain.File;
 import pexper.projects.project_hub.domain.Owner;
 import pexper.projects.project_hub.domain.Project;
@@ -33,6 +34,11 @@ public class ProjectsController {
     @GetMapping("/all")
     public List<Project> getAllFull() {
         return projectService.findAll();
+    }
+
+    @GetMapping("/by-contract/{contractId}")
+    public List<Project> getByContract(@PathVariable Long contractId) {
+        return projectService.findByContractRegistrationId(contractId);
     }
 
     @GetMapping("/{id}")
@@ -77,5 +83,12 @@ public class ProjectsController {
         Project project = projectService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found: " + id));
         return ResponseEntity.ok(project.getAddress());
+    }
+
+    @GetMapping("/{id}/contract")
+    public ResponseEntity<ContractRegistration> getContract(@PathVariable Long id) {
+        Project project = projectService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found: " + id));
+        return ResponseEntity.ok(project.getContractRegistration());
     }
 }

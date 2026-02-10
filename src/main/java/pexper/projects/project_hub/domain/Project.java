@@ -16,7 +16,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = {"owners", "address", "files"})
+@ToString(exclude = {"owners", "address", "files", "contractRegistration"})
 public class Project {
 
     @Id
@@ -24,6 +24,24 @@ public class Project {
     @EqualsAndHashCode.Include
     private Long id;
     private String projectName;
+    private String projectType;
+    private String projectNumber;
+    private String purchaseOrder;
+    private String serviceOrder;
+    private String poNumber;
+    private String directClient;
+    private String directClientManager;
+    private String finalClient;
+    private String finalClientManager;
+    private String siteId;
+
+    @Column(name = "address_reference")
+    private String addressId;
+
+    @ManyToOne
+    @JoinColumn(name = "contract_registration_id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private ContractRegistration contractRegistration;
 
     @ManyToMany
     @JoinTable(name = "owner_project", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "owner_id"))

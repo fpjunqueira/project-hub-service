@@ -79,6 +79,31 @@ SQLite dependencies are included (`sqlite-jdbc` and Hibernate community dialects
 To use SQLite, define a profile with a `jdbc:sqlite:` URL and set
 `spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect`.
 
+### Hub-service profile (dev)
+
+Run the backend API and the Angular app in dev mode:
+
+```bash
+./mvnw spring-boot:run
+```
+
+If port 8080 is already in use, run the API on 8081:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.arguments=--server.port=8081
+```
+
+```bash
+cd ../../angular/project-hub-app
+npm start
+```
+
+If port 4200 is already in use, start the UI on a different port:
+
+```bash
+npm start -- --port 4201
+```
+
 ## Building and Running
 
 ### Using Maven Wrapper
@@ -373,3 +398,29 @@ On Windows (PowerShell):
 
 ## Helm / AKS / ARO (Azure Openshift)
  
+## API to receive an image list (upload) and return a PDF with one image per page
+    🧩 Java APIs:
+    - 📄 Apache PDFBox: Create a PDDocument, add PDPage, and insert images with PDImageXObject and PDPageContentStream.
+    - 📘 iText (Java): Use Document and Image to group and arrange images across PDF pages.
+    - 🖼️ Java Advanced Imaging (JAI): Optional pre-processing of images before PDF conversion.
+    🧭 Aggregation steps:
+    - 🟢 Initialize the PDF document.
+    - 🔁 Iterate over the image list.
+    - 🖼️ Load each image and insert it into the PDF.
+    - ✅ Close the document and save the final PDF.
+    📝 Notes:
+    - 🚫 Do not store the document.
+    - 🧾 The PDF must preserve the same order as the input image list.
+    - 📏 Configure maximum file size (5MB).
+    - ⚡ Endpoint must be async.
+    - 🧮 Validate that the sum of input image sizes matches the generated PDF size.
+    - 🧪 Add unit tests for the endpoint.
+    - 🧼 Input and output files must not be stored.
+    - 🧰 Test with Postman.
+    - 🔗 Frontend integration.
+    - 🔐 Add auth.
+    - 🧵 Use a queue since the API is async.
+    - 🧭 Traceability.
+    - 🧱 Separate the endpoint into a new microservice (recommended).
+    - 🔁 Use RESTTemplate in the edge microservice for upload orchestration.
+    - 🔍 OCR.
