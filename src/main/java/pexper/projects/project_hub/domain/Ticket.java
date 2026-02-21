@@ -12,6 +12,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -19,11 +22,19 @@ import lombok.Setter;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Ticket {
 
+    public static final String STATUS_OPEN = "OPEN";
+    public static final String STATUS_IN_PROGRESS = "IN_PROGRESS";
+    public static final String STATUS_CLOSED = "CLOSED";
+    public static final String STATUS_ON_HOLD = "ON_HOLD";
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     private Long id;
     private String ticketNumber;
+    private String status;
+    private LocalDate dueDate;
+    private LocalDateTime createdAt;
     private String directClient;
     private String directClientManager;
     private String finalClient;

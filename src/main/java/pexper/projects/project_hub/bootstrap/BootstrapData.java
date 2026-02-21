@@ -12,6 +12,10 @@ import pexper.projects.project_hub.domain.File;
 import pexper.projects.project_hub.domain.Owner;
 import pexper.projects.project_hub.domain.Project;
 import pexper.projects.project_hub.domain.Ticket;
+import pexper.projects.project_hub.domain.TicketHistory;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import pexper.projects.project_hub.domain.TimSite;
 import pexper.projects.project_hub.domain.UserRegistration;
 import pexper.projects.project_hub.domain.VehicleRegistrationInfo;
@@ -24,6 +28,7 @@ import pexper.projects.project_hub.repositories.DocumentationRepository;
 import pexper.projects.project_hub.repositories.FileRepository;
 import pexper.projects.project_hub.repositories.OwnerRepository;
 import pexper.projects.project_hub.repositories.ProjectRepository;
+import pexper.projects.project_hub.repositories.TicketHistoryRepository;
 import pexper.projects.project_hub.repositories.TicketRepository;
 import pexper.projects.project_hub.repositories.TimSiteRepository;
 import pexper.projects.project_hub.repositories.UserRegistrationRepository;
@@ -50,6 +55,7 @@ public class BootstrapData implements CommandLineRunner {
     private final VivoSiteRepository vivoSiteRepository;
     private final ContractRegistrationRepository contractRegistrationRepository;
     private final TicketRepository ticketRepository;
+    private final TicketHistoryRepository ticketHistoryRepository;
 
     public BootstrapData(ProjectRepository projectRepository,
                          OwnerRepository ownerRepository,
@@ -63,7 +69,8 @@ public class BootstrapData implements CommandLineRunner {
                          TimSiteRepository timSiteRepository,
                          VivoSiteRepository vivoSiteRepository,
                          ContractRegistrationRepository contractRegistrationRepository,
-                         TicketRepository ticketRepository) {
+                         TicketRepository ticketRepository,
+                         TicketHistoryRepository ticketHistoryRepository) {
         this.projectRepository = projectRepository;
         this.ownerRepository = ownerRepository;
         this.addressRepository = addressRepository;
@@ -77,6 +84,7 @@ public class BootstrapData implements CommandLineRunner {
         this.vivoSiteRepository = vivoSiteRepository;
         this.contractRegistrationRepository = contractRegistrationRepository;
         this.ticketRepository = ticketRepository;
+        this.ticketHistoryRepository = ticketHistoryRepository;
     }
 
 
@@ -459,10 +467,17 @@ public class BootstrapData implements CommandLineRunner {
         projectRepository.saveAll(projects);
 
         List<Ticket> tickets = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        String[] statuses = { Ticket.STATUS_OPEN, Ticket.STATUS_IN_PROGRESS, Ticket.STATUS_CLOSED, Ticket.STATUS_ON_HOLD };
         for (int i = 1; i <= 10; i++) {
             Ticket ticket = new Ticket();
             Project project = projects.get((i - 1) % projects.size());
             ticket.setTicketNumber("TK-" + String.format("%05d", i));
+            ticket.setStatus(statuses[(i - 1) % statuses.length]);
+            // Vary due dates: some in past (late SLA), some in future
+            LocalDate dueDate = i <= 4 ? today.minusDays(i) : today.plusDays((i % 3) - 1);
+            ticket.setDueDate(dueDate);
+            ticket.setCreatedAt(LocalDateTime.now().minusDays(i));
             ticket.setDirectClient(project.getDirectClient());
             ticket.setDirectClientManager(project.getDirectClientManager());
             ticket.setFinalClient(project.getFinalClient());
@@ -489,6 +504,37 @@ public class BootstrapData implements CommandLineRunner {
             tickets.add(ticket);
         }
         ticketRepository.saveAll(tickets);
+
+        String[] operators = { "tech-1@example.com", "tech-2@example.com", "ops@example.com", "admin@example.com", "tech-3@example.com" };
+        for (int i = 0; i < tickets.size(); i++) {
+            Ticket t = tickets.get(i);
+            LocalDateTime baseTime = t.getCreatedAt() != null ? t.getCreatedAt() : LocalDateTime.now();
+            String currentStatus = t.getStatus();
+
+            TicketHistory h0 = new TicketHistory(t.getId(), null, Ticket.STATUS_OPEN, baseTime);
+            h0.setChangedBy("System");
+            ticketHistoryRepository.save(h0);
+
+            if (currentStatus.equals(Ticket.STATUS_IN_PROGRESS)) {
+                TicketHistory h = new TicketHistory(t.getId(), Ticket.STATUS_OPEN, Ticket.STATUS_IN_PROGRESS, baseTime.plusHours(2));
+                h.setChangedBy(operators[i % operators.length]);
+                ticketHistoryRepository.save(h);
+            } else if (currentStatus.equals(Ticket.STATUS_ON_HOLD)) {
+                TicketHistory h = new TicketHistory(t.getId(), Ticket.STATUS_OPEN, Ticket.STATUS_IN_PROGRESS, baseTime.plusHours(4));
+                h.setChangedBy(operators[i % operators.length]);
+                ticketHistoryRepository.save(h);
+                TicketHistory h2 = new TicketHistory(t.getId(), Ticket.STATUS_IN_PROGRESS, Ticket.STATUS_ON_HOLD, baseTime.plusDays(1));
+                h2.setChangedBy(operators[(i + 1) % operators.length]);
+                ticketHistoryRepository.save(h2);
+            } else if (currentStatus.equals(Ticket.STATUS_CLOSED)) {
+                TicketHistory h = new TicketHistory(t.getId(), Ticket.STATUS_OPEN, Ticket.STATUS_IN_PROGRESS, baseTime.plusHours(6));
+                h.setChangedBy(operators[i % operators.length]);
+                ticketHistoryRepository.save(h);
+                TicketHistory h2 = new TicketHistory(t.getId(), Ticket.STATUS_IN_PROGRESS, Ticket.STATUS_CLOSED, baseTime.plusDays(2));
+                h2.setChangedBy(operators[(i + 2) % operators.length]);
+                ticketHistoryRepository.save(h2);
+            }
+        }
 
         System.out.println("Owners loaded: " + ownerRepository.count());
         System.out.println("Projects loaded: " + projectRepository.count());
