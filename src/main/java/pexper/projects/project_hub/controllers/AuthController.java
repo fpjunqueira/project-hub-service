@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.RestController;
 import pexper.projects.project_hub.dto.AuthRequest;
 import pexper.projects.project_hub.dto.AuthResponse;
@@ -11,6 +12,7 @@ import pexper.projects.project_hub.services.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
+@ConditionalOnProperty(name = "app.auth.mode", havingValue = "local")
 public class AuthController {
 
     private final AuthService authService;

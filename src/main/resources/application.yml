@@ -9,6 +9,15 @@ app:
     secret: change-me-to-a-long-random-secret
     expiration-minutes: 60
   auth:
+    mode: ${AUTH_MODE:local}
     default-user: admin
     default-password: admin123
     default-role: ADMIN
+    # Additional users: "username:password:role" (role optional, defaults to USER)
+    # users:
+    #   - "john:secret123:USER"
+    #   - "jane:pass456:ADMIN"
+
+security:
+  claims:
+    group-role-mappings: {}

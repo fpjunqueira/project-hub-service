@@ -4,6 +4,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import pexper.projects.project_hub.config.JwtProperties;
 import pexper.projects.project_hub.dto.AuthResponse;
@@ -13,6 +14,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 @Service
+@ConditionalOnProperty(name = "app.auth.mode", havingValue = "local")
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
@@ -35,6 +37,6 @@ public class AuthService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         String token = jwtService.generateToken(userDetails);
         Instant expiresAt = Instant.now().plus(jwtProperties.getExpirationMinutes(), ChronoUnit.MINUTES);
-        return new AuthResponse(token, "Bearer", expiresAt);
+        return new AuthResponse(token, "Bearer", expiresAt, userDetails.getUsername());
     }
 }

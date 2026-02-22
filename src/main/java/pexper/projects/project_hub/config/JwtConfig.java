@@ -1,5 +1,6 @@
 package pexper.projects.project_hub.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -13,6 +14,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 
 @Configuration
+@ConditionalOnProperty(name = "app.auth.mode", havingValue = "local")
 public class JwtConfig {
 
     private final JwtProperties jwtProperties;

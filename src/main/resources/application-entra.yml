@@ -1,0 +1,21 @@
+# Profile for Azure Entra ID (OAuth2) authentication.
+# Activate with: -Dspring.profiles.active=h2,entra
+# Required env vars: OIDC_ISSUER_URI, OIDC_AUDIENCE (optional, defaults to api://project-hub)
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OIDC_ISSUER_URI}
+          audiences: ${OIDC_AUDIENCE:api://project-hub}
+
+app:
+  auth:
+    mode: entra
+
+security:
+  claims:
+    group-role-mappings:
+      # Map Azure AD group Object IDs to roles, e.g.:
+      # "00000000-0000-0000-0000-000000000000": "ADMIN"

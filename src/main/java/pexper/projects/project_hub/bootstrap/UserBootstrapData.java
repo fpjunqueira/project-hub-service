@@ -27,6 +27,13 @@ public class UserBootstrapData implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        createDefaultUser();
+        for (String spec : authProperties.getUsers()) {
+            createUserFromSpec(spec);
+        }
+    }
+
+    private void createDefaultUser() {
         String username = authProperties.getDefaultUser();
         if (username == null || username.isBlank()) {
             return;
@@ -34,15 +41,36 @@ public class UserBootstrapData implements CommandLineRunner {
 
         appUserRepository.findByUsername(username).ifPresentOrElse(
                 user -> {},
-                () -> appUserRepository.save(createDefaultUser(username))
+                () -> appUserRepository.save(createUser(username, authProperties.getDefaultPassword(), authProperties.getDefaultRole()))
         );
     }
 
-    private AppUser createDefaultUser(String username) {
+    private void createUserFromSpec(String spec) {
+        if (spec == null || spec.isBlank()) {
+            return;
+        }
+        String[] parts = spec.trim().split(":", 3);
+        if (parts.length < 2) {
+            return;
+        }
+        String username = parts[0].trim();
+        String password = parts[1].trim();
+        String role = parts.length >= 3 ? parts[2].trim() : "USER";
+        if (username.isBlank() || password.isBlank()) {
+            return;
+        }
+
+        appUserRepository.findByUsername(username).ifPresentOrElse(
+                user -> {},
+                () -> appUserRepository.save(createUser(username, password, role))
+        );
+    }
+
+    private AppUser createUser(String username, String plainPassword, String roleStr) {
         AppUser user = new AppUser();
         user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(authProperties.getDefaultPassword()));
-        user.setRole(parseRole(authProperties.getDefaultRole()));
+        user.setPassword(passwordEncoder.encode(plainPassword));
+        user.setRole(parseRole(roleStr));
         return user;
     }
 
